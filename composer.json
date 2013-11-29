@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Paulboco\\Ain": "src/"
+            "Paulboco\\Win": "src/"
         },
         "files": [
             "src/helpers.php"

@@ -1,6 +1,6 @@
 <?php
 
-use Paulboco\Ain\Debug;
+use Paulboco\Win\Debug;
 
 if ( ! function_exists('dv'))
 {
