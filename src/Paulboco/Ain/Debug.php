@@ -5,9 +5,9 @@ class Debug {
 	public static $bypass = false;
 
 	private static $colors = [
+		'#F88',
 		'#9F9',
 		'#6AF',
-		'#F88',
 		'#FF8',
 		'#0FA',
 		'#0FF',
