@@ -1,0 +1,21 @@
+{
+    "name": "paulboco/ain",
+    "description": "All I Need",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Paul Sellers",
+            "email": "paulboco@cableone.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "laravel/framework": ">=4.0.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Paulboco\\Ain": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
