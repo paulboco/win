@@ -15,7 +15,10 @@
     "autoload": {
         "psr-0": {
             "Paulboco\\Ain": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "minimum-stability": "dev"
 }
