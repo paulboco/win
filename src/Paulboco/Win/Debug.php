@@ -107,9 +107,9 @@ class Debug {
 
 		list($caller, $callee) = debug_backtrace();
 
-		echo PHP_EOL . "<pre style='width:auto;background-color:" . self::$colors[$color] . ";border:solid 1px #333;color:#333;font-size:normal;font-family:monospace;line-height:15px;padding:10px;text-align:left;'>";
+		echo PHP_EOL . "<pre style='width:auto;background-color:" . self::$colors[$color] . ";border:solid 1px #333;color:#333;font-size:13px;font-family:monospace;line-height:15px;padding:10px;text-align:left;'>";
 
-		echo '<fieldset><legend style="border-radius:7px;font-size:normal;font-weight:bold;padding:5px;background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.6);">'.$callee['file'].' @ line: '.$callee['line'].'</legend><br>';
+		echo '<fieldset><legend style="border-radius:7px;font-size:1em;font-weight:bold;padding:5px;background:rgba(0,0,0,0.2);color:rgba(0,0,0,0.6);">'.$callee['file'].' @ line: '.$callee['line'].'</legend><br>';
 		echo '<code style="background-color:transparent;">';
 
 		echo $value;
