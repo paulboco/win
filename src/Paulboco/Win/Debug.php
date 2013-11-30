@@ -105,7 +105,7 @@ class Debug {
 
 		$color = self::_set_color($color);
 
-		list($caller, $callee) = debug_backtrace();
+		list($caller, $caller, $callee) = debug_backtrace();
 
 		echo PHP_EOL . "<pre style='width:auto;background-color:" . self::$colors[$color] . ";border:solid 1px #333;color:#333;font-size:13px;font-family:monospace;line-height:15px;padding:10px;text-align:left;'>";
 
