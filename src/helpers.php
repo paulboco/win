@@ -2,6 +2,11 @@
 
 use Paulboco\Win\Debug;
 
+// Change some default xdebug settings
+ini_set('xdebug.var_display_max_depth', '10');
+ini_set('xdebug.var_display_max_children', -1);
+
+
 if ( ! function_exists('dv'))
 {
 	/**
