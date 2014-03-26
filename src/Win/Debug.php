@@ -1,4 +1,4 @@
-<?php namespace Paulboco\Win;
+<?php namespace Win;
 
 class Debug {
 

@@ -1,4 +1,4 @@
-<?php namespace Paulboco\Win;
+<?php namespace Win;
 
 /**
  * Simple FTP Class

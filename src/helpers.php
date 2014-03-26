@@ -1,6 +1,6 @@
 <?php
 
-use Paulboco\Win\Debug;
+use Win\Debug;
 
 // Change some default xdebug settings
 ini_set('xdebug.var_display_max_depth', '10');
