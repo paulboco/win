@@ -91,7 +91,7 @@ class HtmlBuilder extends IlluminateHtmlBuilder {
         $classes[] = $repo->last_updated == $item->updated_at ? 'updated-at' : null;
         $classes[] = (isset($item->deleted_at) and $item->deleted_at) ? 'deleted-at' : null;
 
-        $classes = implode(' ', array_filter($classes));
+        $classes = array_space($classes);
 
         return '<tr class="' . $classes . '">';
     }
