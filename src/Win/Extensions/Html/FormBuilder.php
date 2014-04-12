@@ -5,8 +5,25 @@ use QueryString, Session;
 
 class FormBuilder extends IlluminateFormBuilder {
 
+    /**
+     * The bootstrap grid class prefix.
+     *
+     * @var string
+     */
     protected $gridClass = 'col-md-';
+
+    /**
+     * Number of grid columns for labels.
+     *
+     * @var integer
+     */
     protected $labelClass = 4;
+
+    /**
+     * Number of grid columns for input fields.
+     *
+     * @var integer
+     */
     protected $inputClass = 8;
 
 
