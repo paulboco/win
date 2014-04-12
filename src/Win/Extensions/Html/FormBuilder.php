@@ -1,46 +1,141 @@
 <?php namespace Win\Extensions\Html;
 
 use Illuminate\Html\FormBuilder as IlluminateFormBuilder;
+use QueryString;
 
 class FormBuilder extends IlluminateFormBuilder {
 
     /**
-     * @param       $name
-     * @param       $label
-     * @param null  $value
-     * @param array $options
+     * Bootstrap form group input
+     *
+     * @param  string  $type
+     * @param  string  $name
+     * @param  string  $label
+     * @param  mixed   $value
+     * @param  Illuminate\Support\MessageBag   $errors
      * @return string
      */
-    public function textField($name, $label, $value = null, $options = [])
+    public function groupInput($type, $name, $label, $value, $errors)
     {
-        return $this->field('text', $name, $label, $value, $options);
+        $hasError = $errors->has($name) ? ' has-error' : '';
+
+        $html  = '<div class="form-group' . $hasError . '">';
+        $html .= '<label for="'. $name . '" class="col-md-4 control-label">' . $label . '</label>';
+        $html .= '<div class="col-md-8">';
+        $html .= $this->$type($name, $value, ['id' => $name, 'class' => 'form-control']);
+        $html .= $errors->first($name, '<span class="help-block">:message</span>');
+        $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
     }
 
     /**
-     * @param $html
+     * Bootstrap date picker
+     *
+     * @param  string  $name
+     * @param  string  $label
+     * @param  mixed   $value
+     * @param  Illuminate\Support\MessageBag   $errors
      * @return string
      */
-    private function wrap($html)
+    public function groupDatePicker($name, $label, $value, $errors)
     {
-        return "<div class=\"form-group\">{$html}</div>";
+        $hasError = $errors->has($name) ? ' has-error' : '';
+
+        $html  = '<div class="form-group' . $hasError . '">';
+        $html .= '<label for="'. $name . '" class="col-md-4 control-label">' . $label . '</label>';
+        $html .= '<div class="col-md-8">';
+        $html .= $this->text($name, $value, ['id' => $name, 'class' => 'form-control datepicker']);
+        $html .= $errors->first($name, '<span class="help-block">:message</span>');
+        $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
     }
 
     /**
-     * @param $type
-     * @param $name
-     * @param $label
-     * @param $value
-     * @param $options
+     * CRUD buttons: 'Save', 'Delete' and 'Close'
+     *
+     * @param  string  $route
+     * @param  boolean $mode  show=close, create=save & close, edit=save, delete & close
      * @return string
      */
-    private function field($type, $name, $label, $value, $options)
+    public function crudButtons($route, $mode)
     {
-        $options = array_merge(['class' => 'form-control'], $options);
+        $uri = route($route, QueryString::getByRoute($route));
 
-        $html = $this->label($name, ucwords($label));
-        $html .= $this->input($type, $name, $value, $options);
+        $html  = '<div class="form-group">';
+        $html .= '<div class="col-sm-offset-4 col-sm-8">';
+        $html .= '<a href="' . $uri . '" class="btn btn-default">Close</a> ';
+        $html .= ($mode == 'edit' or $mode == 'create') ? '<button type="submit" class="btn btn-primary">Save</button> ' : '';
+        $html .= ($mode == 'edit') ? '<a class="btn btn-danger pull-right" data-toggle="modal" data-target=".modal-delete-form">Delete</a> ' : '';
+        $html .= ($mode == 'undelete') ? '<a class="btn btn-danger pull-right" data-toggle="modal" data-target=".modal-undelete-form">Un-Delete</a> ' : '';
+        $html .= '</div>';
+        $html .= '</div>';
 
-        return $this->wrap($html);
+        return $html;
     }
+
+    /**
+     * Twitter typeahead
+     *
+     * @param  string    $displayKey
+     * @param  string    $valueKey
+     * @param  string    $label
+     * @param  stdClass  $repo
+     * @return string
+     */
+    public function typeahead($displayKey, $valueKey, $label, $repo)
+    {
+        $id = $repo->data->{$valueKey};
+
+        $html  = '<div class="form-group">';
+        $html .= '<label for="' . $displayKey . '" class="col-md-4 control-label"><span data-toggle="tooltip" data-placement="top" title="' . $id . '">' . $label . '</span></label>';
+        $html .= '<div class="col-md-8">';
+        $html .= '<input id="' . $displayKey . '" name="' . $displayKey . '" value="' . $repo->data->$displayKey . '" class="typeahead-' . $displayKey . ' form-control" type="text">';
+        $html .= '<input type="hidden" name="' . $valueKey . '" value="' . $repo->data->$valueKey . '" id="' . $valueKey . '">';
+        $html .= '</div>';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    /**
+     * Javascript for twitter typeahead
+     *
+     * @param  string    $displayKey
+     * @param  string    $valueKey
+     * @param  string    $route
+     * @return string
+     */
+    public function typeaheadJs($displayKey, $valueKey, $route)
+    {
+        $html  = '<script type="text/javascript">';
+        $html .= '$(document).ready(function() {';
+        $html .= '    var ' . $displayKey . ' = new Bloodhound({';
+        $html .= '        datumTokenizer: Bloodhound.tokenizers.obj.whitespace("' . $displayKey . '"),';
+        $html .= '        queryTokenizer: Bloodhound.tokenizers.whitespace,';
+        $html .= '        limit: 100,';
+        $html .= '        remote: "' . route($route) . '?q=%QUERY"';
+        $html .= '    });';
+        $html .=      $displayKey . '.initialize();';
+        $html .= '    $(".typeahead-' . $displayKey . '").typeahead({';
+        $html .= '        minLength: 2,';
+        $html .= '        highlight: true';
+        $html .= '    },';
+        $html .= '    {';
+        $html .= '        displayKey: "' . $displayKey . '",';
+        $html .= '        source: ' . $displayKey . '.ttAdapter()';
+        $html .= '    })';
+        $html .= '    .on("typeahead:selected", function($e, datum) {';
+        $html .= '        $("#' . $valueKey . '").val(datum["id"]);';
+        $html .= '    });';
+        $html .= '});';
+        $html .= '</script>';
+
+        return $html;
+    }
+
 
 }

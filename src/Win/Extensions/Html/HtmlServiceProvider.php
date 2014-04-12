@@ -1,6 +1,5 @@
 <?php namespace Win\Extensions\Html;
 
-use Illuminate\Html\HtmlBuilder;
 use Illuminate\Support\ServiceProvider;
 
 class HtmlServiceProvider extends ServiceProvider {
