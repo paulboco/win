@@ -155,7 +155,8 @@ $(document).ready(function() {
     {$displayKey}.initialize();
     $(".typeahead-{$displayKey}").typeahead({
         minLength: 2,
-        highlight: true
+        highlight: true,
+        hint: false
     },
     {
         displayKey: "{$displayKey}",
