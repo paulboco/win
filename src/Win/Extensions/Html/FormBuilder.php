@@ -140,30 +140,33 @@ class FormBuilder extends IlluminateFormBuilder {
      */
     public function typeaheadJs($displayKey, $valueKey, $route)
     {
-        $html  = '<script type="text/javascript">';
-        $html .= '$(document).ready(function() {';
-        $html .= '    var ' . $displayKey . ' = new Bloodhound({';
-        $html .= '        datumTokenizer: Bloodhound.tokenizers.obj.whitespace("' . $displayKey . '"),';
-        $html .= '        queryTokenizer: Bloodhound.tokenizers.whitespace,';
-        $html .= '        limit: 100,';
-        $html .= '        remote: "' . route($route) . '?q=%QUERY"';
-        $html .= '    });';
-        $html .=      $displayKey . '.initialize();';
-        $html .= '    $(".typeahead-' . $displayKey . '").typeahead({';
-        $html .= '        minLength: 2,';
-        $html .= '        highlight: true';
-        $html .= '    },';
-        $html .= '    {';
-        $html .= '        displayKey: "' . $displayKey . '",';
-        $html .= '        source: ' . $displayKey . '.ttAdapter()';
-        $html .= '    })';
-        $html .= '    .on("typeahead:selected", function($e, datum) {';
-        $html .= '        $("#' . $valueKey . '").val(datum["id"]);';
-        $html .= '    });';
-        $html .= '});';
-        $html .= '</script>';
+        $route = route($route);
 
-        return $html;
+        return <<<EOT
+
+<script type="text/javascript">
+$(document).ready(function() {
+    var {$displayKey} = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace("{$displayKey}"),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 100,
+        remote: "{$route}?q=%QUERY"
+    });
+    {$displayKey}.initialize();
+    $(".typeahead-{$displayKey}").typeahead({
+        minLength: 2,
+        highlight: true
+    },
+    {
+        displayKey: "{$displayKey}",
+        source: {$displayKey}.ttAdapter()
+    })
+    .on("typeahead:selected", function(\$e, datum) {
+        $("#{$valueKey}").val(datum["id"]);
+    });
+});
+</script>
+EOT;
     }
 
     /**
