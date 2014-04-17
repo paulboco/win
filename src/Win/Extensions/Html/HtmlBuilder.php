@@ -73,7 +73,7 @@ class HtmlBuilder extends IlluminateHtmlBuilder {
         $tabs .= "<li{$trashedClass}>" . link_to_route($route, 'Trashed', $trashedQuery) . '</li>';
 
         // Build the New and Reset tabs
-        $tabs .= '<li>' . link_to_route("shiphed.{$repo->table_name}.create", 'Create New ' . $repo->model_name) . '</li>';
+        $tabs .= '<li>' . link_to_route("shiphed.{$repo->table_name}.create", 'Create New ' . ucwords(str_singular(str_replace('_', ' ', $repo->table_name)))) . '</li>';
         // $tabs .= '<li>' . link_to_route('shiphed.reset', 'Reset', [$route]) . '</li>';
 
         return $tabs .= '</ul>';
