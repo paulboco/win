@@ -42,6 +42,7 @@ class DbUtil {
      * Returns an array of table names in the currently configured database.
      * Returns an empty array when no results found.
      *
+     * @param   string   $database
      * @return  array
      */
     public static function showTables($database = null)
@@ -74,70 +75,77 @@ class DbUtil {
      * Get Table Schema
      *
      * Returns an array of stdClass objects containing column information about
-     * the specified table. If column_name is set, the returned stdClass object
+     * the specified table. If $column is set, the returned stdClass object
      * contains one column. An empty array is returned if no are results found.
      *
-     * @param   string   $database_name
-     * @param   string   $table_name
-     * @param   string   $column_name
+     * @param   string   $database
+     * @param   string   $table
+     * @param   string   $column
      * @return  array|stdClass
      */
-    public static function schema($database_name, $table_name, $column_name = null)
+    public static function schema($database, $table, $column = null)
     {
-        // $comments = static::extractComments($table_name);
-
-        $sql  = 'SHOW COLUMNS FROM `' . $database_name . '`.`' . $table_name . '`';
-        $sql .= $column_name ? " LIKE '{$column_name}';" : ';';
+        $sql  = 'SHOW COLUMNS FROM `' . $database . '`.`' . $table . '`';
+        $sql .= $column ? " LIKE '{$column}';" : ';';
 
         $results = static::fetchAll($sql);
-return $results;
-dd($results);
         $results = static::setColumnPad($results);
 
         foreach ($results as $key => $result)
         {
-            // Change the key to the field name.
-            $newkey = $results[$key]->field;
-            $results[$newkey] = $results[$key];
-            unset($results[$key]);
-
-            $type    = explode('(', $result->type);
+            $type    = explode('(', $result['Type']);
             $type[1] = isset($type[1]) ? explode(')', $type[1]) : array(null, null);
 
-            $results[$newkey]->type    = $type[0];
-            $results[$newkey]->length  = (($type[0] != 'enum') and ($type[0] != 'set')) ? $type[1][0] : null; //is_numeric($type[1][0]) ? $type[1][0] : null;
-            $results[$newkey]->value   = $type[1][0];
-            $results[$newkey]->values  = static::parseValues($type[1][0], $type[0]);
-            $results[$newkey]->attr    = $type[1][1] === '' ? null : trim($type[1][1]);
-            $results[$newkey]->comment = $comments[$result->field]['comment'];
-            $results[$newkey]->data    = $comments[$result->field]['data'];
+            $results[$key]['Type']    = $type[0];
+            $results[$key]['Length']  = (($type[0] != 'enum') and ($type[0] != 'set')) ? $type[1][0] : null; //is_numeric($type[1][0]) ? $type[1][0] : null;
+            $results[$key]['Value']   = $type[1][0];
+            $results[$key]['Values']  = static::extractValues($type);
+            $results[$key]['Attr']    = static::extractAttributes($type);
         }
 
-        if ($column_name)
+        if ($column)
         {
-            return $results[$column_name];
+            return $results[$column];
         }
 
         return $results;
     }
 
     /**
-     * Parse mysql values.
+     * Extract mysql values.
      *
-     * Parse mysql column values according to type. Types enum and set return an
+     * Extract mysql column values according to type. Types enum and set return an
      * array of values.
      *
-     * @param   string   $values
      * @param   string   $type
      * @return  string|array
      */
-    protected static function parseValues($values, $type)
+    protected static function extractValues($type)
     {
+        $values = $type[1][0];
+        $type =  $type[0];
+
         if ($type == 'enum' or $type == 'set')
         {
             $values = str_replace("'", '', $values);
             return explode(',', $values);
         }
+    }
+
+    /**
+     * Extract column attributes.
+     *
+     * @param   string   $type
+     * @return  string|array
+     */
+    protected static function extractAttributes($type)
+    {
+        if ($type[1][1] === '' or $type[1][1] === null)
+        {
+            return null;
+        }
+
+        return trim($type[1][1]);
     }
 
     /**
@@ -152,7 +160,7 @@ dd($results);
 
         foreach ($columns as $key => $column)
         {
-            $len = strlen($column->field);
+            $len = strlen($column['Field']);
 
             if ($len > $max_length)
             {
@@ -164,65 +172,10 @@ dd($results);
         // length and maximum column name length.
         foreach ($columns as $key => $column)
         {
-            $columns[$key]->pad = str_repeat(' ', $max_length - strlen($column->field));
+            $columns[$key]['Pad'] = str_repeat(' ', $max_length - strlen($column['Field']));
         }
 
         return $columns;
-    }
-
-    /**
-     * Extract comments
-     *
-     * Extracts comments from a mySQL create_table statement into an array.
-     *
-     * @param   string   $table_name
-     * @return  array
-     */
-    protected static function extractComments($table_name)
-    {
-        // the create table statement lies in a
-        // class var named 'create table' (with a space).
-        // use this variable overcome the space problem.
-        $class_var = 'create table';
-
-        $regex1 = '|^  `(.+)` |';
-        $regex2 = "#COMMENT '(.+)',$#U";
-
-        $sql = 'SHOW CREATE TABLE `' . $table_name . '`';
-        $results = static::fetchAll($sql);
-
-        $lines = explode("\n", $results[0]->$class_var);
-
-        $comments = array();
-
-        foreach ($lines as $line)
-        {
-            preg_match_all($regex1, $line, $matches);
-
-            // extract column name
-            if ( ! empty($matches[1][0]))
-            {
-                $column_name = $matches[1][0];
-
-                $comments[$column_name] = null;
-
-                preg_match_all($regex2, $line, $matches);
-
-                // extract comment
-                if ( ! empty($matches[1][0]))
-                {
-                    $comment = $matches[1][0];
-                    $split = explode('|', $comment);
-                    $data = $split[0] == 'EVAL' ? eval('return ' . $split[1] . ';') : null;
-                    $comments[$column_name] = array(
-                        'comment' => $comment,
-                        'data' => $data,
-                    );
-                }
-            }
-        }
-
-        return $comments;
     }
 
     /**
