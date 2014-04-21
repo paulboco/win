@@ -80,17 +80,3 @@ if ( ! function_exists('db'))
 		Debug::v($var, (int) !! $var);
 	}
 }
-
-if ( ! function_exists('snake_to_title'))
-{
-	/**
-	 * Dump a boolean variable using var_export.
-	 *
-	 * @param  mixed   $var
-	 * @return void
-	 */
-	function snake_to_title($var)
-	{
-		return ucwords(str_replace('_', ' ', str_singular($var)));
-	}
-}
