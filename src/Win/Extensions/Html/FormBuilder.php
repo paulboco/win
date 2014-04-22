@@ -118,12 +118,14 @@ class FormBuilder extends IlluminateFormBuilder {
     {
         $id = $repo->data->{$valueKey};
 
+        $displayKeyValue = isset($repo->data->{$displayKey}) ? $repo->data->{$displayKey} : null;
+
         $label = '<label for="' . $displayKey . '" class="col-md-4 control-label">'
                . '<span data-toggle="tooltip" data-placement="top" title="' . $id . '">' . $label . '</span>'
                . '</label>';
 
-        $input = '<input id="' . $displayKey . '" name="' . $displayKey . '" value="' . $repo->data->$displayKey . '" class="typeahead-' . $displayKey . ' form-control" type="text">'
-               . '<input type="hidden" name="' . $valueKey . '" value="' . $repo->data->$valueKey . '" id="' . $valueKey . '">';
+        $input = '<input id="' . $displayKey . '" name="' . $displayKey . '" value="' . $displayKeyValue . '" class="typeahead-' . $displayKey . ' form-control" type="text">'
+               . '<input type="hidden" name="' . $valueKey . '" value="' . $id . '" id="' . $valueKey . '">';
 
         $input  = $this->groupContainer($input);
 
