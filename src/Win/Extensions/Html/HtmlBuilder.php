@@ -1,7 +1,6 @@
 <?php namespace Win\Extensions\Html;
 
 use Illuminate\Html\HtmlBuilder as IlluminateHtmlBuilder;
-use QueryString;
 
 class HtmlBuilder extends IlluminateHtmlBuilder {
 
@@ -45,38 +44,6 @@ class HtmlBuilder extends IlluminateHtmlBuilder {
         $query->d = $direction;
 
         return link_to_route($route, $title . $arrow, $query->toArray());
-    }
-
-    /**
-     * Filter tabs for listing
-     *
-     * @param  stdClass  $repo
-     * @return string
-     */
-    public function filterTabs($repo)
-    {
-        $route = "shiphed.{$repo->table_name}.index";
-
-        $allClass     = $repo->query->f == 'all'     ? ' class="active"' : '';
-        $trashedClass = $repo->query->f == 'trashed' ? ' class="active"' : '';
-
-        // Open unordered list
-        $tabs  = '<ul class="nav nav-tabs">';
-        $tabs .= '<li>&nbsp;</li>';
-
-        // Build the All tab
-        $allQuery = QueryString::getByFilter($route, 'all');
-        $tabs .= "<li{$allClass}>" . link_to_route($route, 'All', $allQuery) . '</li>';
-
-        // Build the Trashed tab
-        $trashedQuery = QueryString::getByFilter($route, 'trashed');
-        $tabs .= "<li{$trashedClass}>" . link_to_route($route, 'Trashed', $trashedQuery) . '</li>';
-
-        // Build the New and Reset tabs
-        $tabs .= '<li>' . link_to_route("shiphed.{$repo->table_name}.create", 'Create New ' . ucwords(str_singular(str_replace('_', ' ', $repo->table_name)))) . '</li>';
-        // $tabs .= '<li>' . link_to_route('shiphed.reset', 'Reset', [$route]) . '</li>';
-
-        return $tabs .= '</ul>';
     }
 
     /**
